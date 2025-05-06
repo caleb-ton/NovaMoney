@@ -1,257 +1,170 @@
 package com.caleb.novamoney.ui.theme.screens.home
 
 
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.material3.MaterialTheme
+import com.caleb.novamoney.R
 
-@Composable
-fun FinanceHomeScreen() {
-    Scaffold(
-        topBar = {
-                Text(text = "NovaMoney")
-        },
-        content = { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp)
-            ) {
-                BalanceCard(balance = 3421.56)
-                Spacer(modifier = Modifier.height(24.dp))
-                Text("Recent Transactions", style = MaterialTheme.typography.titleLarge)
-                Spacer(modifier = Modifier.height(8.dp))
-                TransactionList(transactions = sampleTransactions)
-            }
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MainScreen()
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen() {
+    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+    var selectedBottomItem by remember { mutableStateOf("Home") }
+    val newsList = listOf(
+        "Markets Rally as Tech Stocks Surge",
+        "Federal Reserve Holds Interest Rates",
+        "Bitcoin Hits New High",
+        "Oil Prices Drop Amid Global Uncertainty",
+        "Major Banks Announce Quarterly Earnings"
     )
-}
 
-@Composable
-fun BalanceCard(balance: Double) {
-    Card(
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("Total Balance", color = Color.White)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "$${"%.2f".format(balance)}",
-                style = MaterialTheme.typography.headlineSmall,
-                color = Color.White
-            )
-        }
-    }
-}
-
-@Composable
-fun TransactionList(transactions: List<Transaction>) {
-    LazyColumn {
-        items(transactions) { transaction ->
-            TransactionItem(transaction)
-        }
-    }
-}
-
-@Composable
-fun TransactionItem(transaction: Transaction) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-    ) {
-        Row(
+    Column(modifier = Modifier.fillMaxSize()) {
+        // 👇 App Logo at the top
+        Box(
             modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
+                .height(80.dp)
+                .width(100.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Column {
-                Text(transaction.title, style = MaterialTheme.typography.bodyMedium)
-                Text(transaction.date, style = MaterialTheme.typography.bodySmall)
-            }
-            Text(
-                text = "$${transaction.amount}",
-                color = if (transaction.amount < 0) Color.Red else Color.Green,
-                style = MaterialTheme.typography.bodyMedium
+            Image(
+                painter = painterResource(id = R.drawable.aaron), // 👈 Replace with your actual logo resource
+                contentDescription = "App Logo",
+                modifier = Modifier.size(60.dp)
             )
         }
+
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("Search finance news") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { /* handle menu click */ }) {
+                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { /* handle search action */ }) {
+                            Icon(Icons.Default.Search, contentDescription = "Search")
+                        }
+                    }
+                )
+            },
+            bottomBar = {
+                NavigationBar {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                        label = { Text("Home") },
+                        selected = selectedBottomItem == "Home",
+                        onClick = { selectedBottomItem = "Home" }
+                    )
+
+                    NavigationBarItem(
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.aaron),
+                                contentDescription = "AI",
+                                modifier = Modifier.size(24.dp),
+                                tint = Color.Unspecified
+                            )
+                        },
+                        label = { Text("AI") },
+                        selected = selectedBottomItem == "AI",
+                        onClick = { selectedBottomItem = "AI" }
+                    )
+
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+                        label = { Text("Profile") },
+                        selected = selectedBottomItem == "Profile",
+                        onClick = { selectedBottomItem = "Profile" }
+                    )
+
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
+                        label = { Text("Alerts") },
+                        selected = selectedBottomItem == "Alerts",
+                        onClick = { selectedBottomItem = "Alerts" }
+                    )
+
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
+                        label = { Text("Account") },
+                        selected = selectedBottomItem == "Account",
+                        onClick = { selectedBottomItem = "Account" }
+                    )
+                }
+            },
+            content = { padding ->
+                LazyColumn(
+                    contentPadding = padding,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(newsList) { news ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                                .clickable { /* handle news click */ },
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = news,
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Click to read more...",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        )
     }
 }
-
-data class Transaction(
-    val title: String,
-    val amount: Double,
-    val date: String
-)
-
-val sampleTransactions = listOf(
-    Transaction("Grocery", -45.0, "Apr 30"),
-    Transaction("Salary", 3000.0, "Apr 28"),
-    Transaction("Coffee", -3.5, "Apr 27"),
-    Transaction("Electricity Bill", -120.0, "Apr 25")
-)
-
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewFinanceHomeScreen() {
-    FinanceHomeScreen()
+fun DefaultPreview() {
+    MainScreen()
 }
-//import android.text.style.BackgroundColorSpan
-//import androidx.compose.foundation.background
-//import androidx.compose.foundation.layout.Arrangement
-//import androidx.compose.foundation.layout.Column
-//import androidx.compose.foundation.layout.Row
-//import androidx.compose.foundation.layout.Spacer
-//import androidx.compose.foundation.layout.fillMaxSize
-//import androidx.compose.foundation.layout.fillMaxWidth
-//import androidx.compose.foundation.layout.height
-//import androidx.compose.foundation.layout.padding
-//import androidx.compose.foundation.lazy.LazyColumn
-//import androidx.compose.foundation.shape.RoundedCornerShape
-//import androidx.compose.material3.Card
-//import androidx.compose.material3.MaterialTheme
-//import androidx.compose.material3.Scaffold
-//import androidx.compose.material3.Text
-//import androidx.compose.runtime.Composable
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.tooling.preview.Preview
-//import androidx.compose.ui.unit.dp
-//import com.caleb.novamoney.ui.theme.screens.home.Transaction
-//
-//
-//@Composable
-//fun FinanceHomeScreen() {
-//    Scaffold(
-//        topBar = {
-//                Text(text = "NovaMoney")
-//        },
-//        content = { padding ->
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(padding)
-//                    .padding(16.dp)
-//            ) {
-//                BalanceCard(balance = 3421.56)
-//                Spacer(modifier = Modifier.height(24.dp))
-//                Text("Recent Transactions", style = MaterialTheme.typography.titleMedium)
-//                Spacer(modifier = Modifier.height(8.dp))
-//                TransactionList(transactions = sampleTransactions)
-//            }
-//        }
-//    )
-//}
-//
-//
-//@Composable
-//fun BalanceCard(balance: Double) {
-//    Card(
-//        modifier = Modifier.fillMaxWidth()
-//    ) {
-//        Column(modifier = Modifier.padding(16.dp)) {
-//            Text("Total Balance", color = Color.White)
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Text(
-//                text = "$${"%.2f".format(balance)}",
-//                style = MaterialTheme.typography.headlineLarge,
-//                color = Color.White
-//            )
-//        }
-//    }
-//}
-//
-//@Composable
-//fun TransactionList(transactions: List<Transaction>) {
-//    LazyColumn {
-////        items(transactions) { transaction ->
-////            TransactionItem(transaction)
-//        }
-//    }
-//
-//
-//@Composable
-//fun GroupedTransactionList(transactions: List<Transaction>) {
-//    // Group transactions by date
-//    val groupedTransactions = transactions.groupBy { it.date }
-//
-//    LazyColumn {
-//        groupedTransactions.forEach { (date, transactionsForDate) ->
-//            item {
-//                // Header for the grouped date
-//                Text(
-//                    text = date,
-//                    style = MaterialTheme.typography.titleLarge,
-//                    modifier = Modifier.padding(16.dp)
-//                )
-//            }
-//
-////            items(transactionsForDate) { transaction ->
-////                TransactionItem(transaction)
-////            }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun TransactionItem(transaction: Transaction) {
-//    Card(
-//        shape = RoundedCornerShape(8.dp),
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(vertical = 4.dp)
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .padding(12.dp)
-//                .fillMaxWidth(),
-//            horizontalArrangement = Arrangement.SpaceBetween
-//        ) {
-//            Column {
-//                Text(transaction.title, style = MaterialTheme.typography.bodyLarge)
-//                Text(transaction.date, style = MaterialTheme.typography.bodyMedium)
-//            }
-//            Text(
-//                text = "$${transaction.amount}",
-//                color = if (transaction.amount < 0) Color.Red else Color.Green,
-//                style = MaterialTheme.typography.bodyLarge
-//            )
-//        }
-//    }
-//}
-//
-//data class Transaction(
-//    val title: String,
-//    val amount: Double,
-//    val date: String
-//)
-//
-//val sampleTransactions = listOf(
-//    Transaction("Grocery", -45.0, "Apr 30"),
-//    Transaction("Salary", 3000.0, "Apr 28"),
-//    Transaction("Coffee", -3.5, "Apr 27"),
-//    Transaction("Electricity Bill", -120.0, "Apr 25")
-//)
-//
-//@Preview
-//@Composable
-//private fun Finance() {
-//    FinanceHomeScreen()
-//
-//}
