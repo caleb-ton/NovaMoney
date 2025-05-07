@@ -21,9 +21,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.caleb.novamoney.navigation.ROUTE_HOME
+import com.caleb.novamoney.navigation.ROUTE_REGISTER
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
+fun LoginScreen(navController: NavController) {
     // State variables for username and password
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
@@ -41,7 +45,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
     // Handle login
     fun handleLogin() {
         if (username.text == "user" && password.text == "password") {
-            onLoginSuccess() // Simulate login success
         } else {
             errorMessage = "Invalid username or password"
         }
@@ -117,7 +120,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
         // Login Button
         Button(
-            onClick = {    },
+            onClick = {   navController.navigate(ROUTE_HOME)  },
             modifier = Modifier
                 .fillMaxWidth() // Ensure the button takes the full width of the parent
                 .padding(horizontal = 35.dp), // Optional: Remove horizontal padding if needed
@@ -138,7 +141,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
         // Optional: You can add a sign-up button here if you need one
         Button(
-            onClick = {       },
+            onClick = { navController.navigate(ROUTE_REGISTER)     },
             modifier = Modifier.fillMaxWidth().width(30.dp)
                 .padding(horizontal = 35.dp),
             colors = ButtonDefaults.buttonColors(
@@ -159,7 +162,5 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewLoginScreen() {
-    LoginScreen(onLoginSuccess = {
-        // Handle login success (for example, navigate to the home screen)
-    })
+    LoginScreen(rememberNavController())
 }

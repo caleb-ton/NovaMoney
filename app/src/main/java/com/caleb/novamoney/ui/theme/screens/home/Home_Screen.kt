@@ -20,20 +20,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.caleb.novamoney.R
+import com.caleb.novamoney.navigation.ROUTE_HOME
+import com.caleb.novamoney.navigation.ROUTE_PROFILE
+import com.caleb.novamoney.navigation.ROUTE_SETTINGS
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MainScreen()
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var selectedBottomItem by remember { mutableStateOf("Home") }
     val newsList = listOf(
@@ -73,7 +70,7 @@ fun MainScreen() {
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { /* handle menu click */ }) {
+                        IconButton(onClick = { navController.navigate(ROUTE_SETTINGS) }) {
                             Icon(Icons.Default.Menu, contentDescription = "Menu")
                         }
                     },
@@ -90,35 +87,41 @@ fun MainScreen() {
                         icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                         label = { Text("Home") },
                         selected = selectedBottomItem == "Home",
-                        onClick = { selectedBottomItem = "Home" }
+                        onClick = {
+                            navController.navigate(ROUTE_HOME)
+                            selectedBottomItem = "Home" }
                     )
 
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.aaron),
-                                contentDescription = "AI",
-                                modifier = Modifier.size(24.dp),
-                                tint = Color.Unspecified
-                            )
-                        },
-                        label = { Text("AI") },
-                        selected = selectedBottomItem == "AI",
-                        onClick = { selectedBottomItem = "AI" }
-                    )
+//                    NavigationBarItem(
+//                        icon = {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.aaron),
+//                                contentDescription = "AI",
+//                                modifier = Modifier.size(24.dp),
+//                                tint = Color.Unspecified
+//                            )
+//                        },
+//                        label = { Text("AI") },
+//                        selected = selectedBottomItem == "AI",
+//                        onClick = {
+//                            selectedBottomItem = "AI" }
+//                    )
 
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                         label = { Text("Profile") },
                         selected = selectedBottomItem == "Profile",
-                        onClick = { selectedBottomItem = "Profile" }
+                        onClick = {
+                            navController.navigate(ROUTE_PROFILE)
+                            selectedBottomItem = "Profile" }
                     )
 
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
                         label = { Text("Alerts") },
                         selected = selectedBottomItem == "Alerts",
-                        onClick = { selectedBottomItem = "Alerts" }
+                        onClick = { navController.navigate(ROUTE_NOTIFCATION)
+                            selectedBottomItem = "Alerts" }
                     )
 
                     NavigationBarItem(
@@ -166,5 +169,5 @@ fun MainScreen() {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    MainScreen()
+    MainScreen(rememberNavController())
 }

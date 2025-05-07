@@ -2,227 +2,370 @@ package com.caleb.novamoney.ui.theme.screens.transaction
 
 
 
-import androidx.compose.foundation.background
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
+import androidx.compose.ui.tooling.preview.Preview
+import com.caleb.novamoney.R
 
-// Data model
-data class Transaction(
-    val id: Int,
-    val category: String,
-    val amount: Float,
-    val date: String,
+data class FullTransaction(
+    val id: String,
+    val dateTime: String,
+    val amount: Double,
+    val currency: String,
+    val status: String,
     val merchant: String,
-    val isRecurring: Boolean = false,
-    val note: String = ""
+    val paymentMethod: String,
+    val category: String,
+    val notes: String,
+    val receiptUrl: String?, // Image/PDF URL
+    val location: String?,
+    val convertedAmount: String?,
+    val rewardPoints: Int?,
+    val isRecurring: Boolean,
+    val transactionType: String // Debit, Credit, Refund
 )
 
-// Summary at top
 @Composable
-fun TransactionSummary(transactions: List<Transaction>) {
-    val totalSpent = transactions.sumOf { it.amount.toDouble() }
-    val totalIncome = transactions.filter { it.amount < 0 }.sumOf { it.amount.toDouble() }
-    val balance = totalIncome + totalSpent
-
-    Column(
+fun TransactionCard(txn: FullTransaction, hideAmount: Boolean = false) {
+    val context = LocalContext.current
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(8.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Text("Summary", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(8.dp))
-        Text("Total Spent: \$${totalSpent}")
-        Text("Total Income: \$${-totalIncome}")
-        Text("Balance: \$${balance}")
-    }
-}
-
-// Category breakdown bar
-@Composable
-fun CategoryBreakdown(transactions: List<Transaction>) {
-    val categoryTotals = transactions.groupBy { it.category }
-        .mapValues { entry -> entry.value.sumOf { it.amount.toDouble() } }
-
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        Text("Category Breakdown", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(8.dp))
-        categoryTotals.forEach { (category, total) ->
-            Text("$category: \$${total}")
-            LinearProgressIndicator(
-                progress = (total / transactions.sumOf { it.amount.toDouble() }).toFloat(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .padding(vertical = 4.dp),
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
-// Transaction row with swipe actions
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TransactionRow(
-    transaction: Transaction,
-    onDelete: (Transaction) -> Unit,
-    onEdit: (Transaction) -> Unit,
-    onClick: (Transaction) -> Unit
-) {
-    val dismissState = rememberDismissState()
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(dismissState.currentValue) {
-        if (dismissState.currentValue == DismissValue.DismissedToEnd) {
-            scope.launch { onEdit(transaction) }
-            dismissState.reset()
-        } else if (dismissState.currentValue == DismissValue.DismissedToStart) {
-            scope.launch { onDelete(transaction) }
-            dismissState.reset()
-        }
-    }
-
-    SwipeToDismiss(
-        state = dismissState,
-        background = {
-            val color = when (dismissState.dismissDirection) {
-                DismissDirection.StartToEnd -> Color.Green
-                DismissDirection.EndToStart -> Color.Red
-                null -> Color.Transparent
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color)
-                    .padding(20.dp),
-                contentAlignment = Alignment.Center
+        Column(modifier = Modifier.padding(16.dp)) {
+            // ID + Status
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                val icon = when (dismissState.dismissDirection) {
-                    DismissDirection.StartToEnd -> Icons.Default.Edit
-                    DismissDirection.EndToStart -> Icons.Default.Delete
-                    null -> null
-                }
-                icon?.let {
-                    Icon(imageVector = it, contentDescription = null, tint = Color.White)
+                Text("ID: ${txn.id}", fontSize = 12.sp, color = Color.Gray)
+                StatusBadge(status = txn.status)
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Merchant + Date
+            Text(txn.merchant, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(txn.dateTime, fontSize = 12.sp, color = Color.Gray)
+
+            Spacer(Modifier.height(8.dp))
+
+            // Amount + Currency Conversion
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = if (hideAmount) "••••" else "${txn.currency} ${"%.2f".format(txn.amount)}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+                Spacer(Modifier.width(8.dp))
+                txn.convertedAmount?.let {
+                    Text("($it)", fontSize = 12.sp, color = Color.Gray)
                 }
             }
-        },
-        dismissContent = {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-                    .clickable { onClick(transaction) }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Payment, Category, Reward Points
+            Text("Payment: ${txn.paymentMethod}", fontSize = 12.sp)
+            Text("Category: ${txn.category}", fontSize = 12.sp)
+            txn.rewardPoints?.let {
+                Text("Reward Points: $it", fontSize = 12.sp, color = Color(0xFF9C27B0))
+            }
+            if (txn.isRecurring) {
+                Text("Recurring: Yes", fontSize = 12.sp, color = Color(0xFF3F51B5))
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Notes
+            if (txn.notes.isNotBlank()) {
+                Text("Note: ${txn.notes}", fontSize = 12.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            }
+
+            // Receipt/Attachment preview
+            txn.receiptUrl?.let {
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Create, contentDescription = "Receipt")
+                    Text("View Receipt", color = Color.Blue, modifier = Modifier.padding(start = 4.dp))
+                }
+            }
+
+            // Location (map placeholder)
+            txn.location?.let {
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.LocationOn, contentDescription = "Location")
+                    Text(it, fontSize = 12.sp, color = Color.Gray)
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Actions: Report, Refund, Share, Split, Repeat
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("${transaction.category} - \$${transaction.amount}", fontWeight = FontWeight.Bold)
-                        Text("${transaction.merchant} - ${transaction.date}", fontSize = 12.sp, color = Color.Gray)
-                        if (transaction.isRecurring) {
-                            Text("Recurring", fontSize = 10.sp, color = Color.Magenta)
-                        }
-                    }
+                ActionIcon(Icons.Default.Warning, "Report") {
+                    Toast.makeText(context, "Report Issue", Toast.LENGTH_SHORT).show()
+                }
+                ActionIcon(Icons.Default.AddCircle, "Refund") {
+                    Toast.makeText(context, "Request Refund", Toast.LENGTH_SHORT).show()
+                }
+                ActionIcon(Icons.Default.Share, "Share") {
+                    Toast.makeText(context, "Share Details", Toast.LENGTH_SHORT).show()
+                }
+                ActionIcon(Icons.Default.Add, "Split") {
+                    Toast.makeText(context, "Split Bill", Toast.LENGTH_SHORT).show()
+                }
+                ActionIcon(Icons.Default.Refresh, "Repeat") {
+                    Toast.makeText(context, "Repeat Transaction", Toast.LENGTH_SHORT).show()
                 }
             }
         }
-    )
+    }
 }
 
-// Main Transaction Screen
 @Composable
-fun TransactionScreen() {
-    var transactions by remember {
-        mutableStateOf(
-            listOf(
-                Transaction(1, "Food", 25f, "2025-05-01", "McDonald's", true),
-                Transaction(2, "Transport", 15f, "2025-05-02", "Uber"),
-                Transaction(3, "Entertainment", 50f, "2025-05-03", "Netflix", true),
-                Transaction(4, "Groceries", 80f, "2025-05-04", "Walmart")
-            )
+fun StatusBadge(status: String) {
+    val (color, icon) = when (status.lowercase()) {
+        "completed" -> Color(0xFF4CAF50) to Icons.Default.CheckCircle
+        "canceled" -> Color(0xFF9E9E9E) to Icons.Default.Close
+        else -> Color.Gray to Icons.Default.Add
+    }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
+        Text(
+            text = status,
+            color = color,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(start = 4.dp)
         )
     }
-    var searchQuery by remember { mutableStateOf("") }
+}
+
+@Composable
+fun ActionIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(4.dp)
+            .clickable { onClick() }
+    ) {
+        Icon(icon, contentDescription = label, tint = MaterialTheme.colorScheme.primary)
+        Text(label, fontSize = 10.sp)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FullTransactionScreen() {
+    var hideAmount by remember { mutableStateOf(false) }
+    var search by remember { mutableStateOf("") }
+    var dateRange by remember { mutableStateOf("") }
+    var amountRange by remember { mutableStateOf("") }
+    var typeFilter by remember { mutableStateOf("") }
+    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+    var selectedBottomItem by remember { mutableStateOf("Home") }
+
+    val transactions = listOf(
+        FullTransaction(
+            id = "TXN123456",
+            dateTime = "2025-05-07 10:45 AM",
+            amount = 59.99,
+            currency = "USD",
+            status = "Completed",
+            merchant = "Amazon",
+            paymentMethod = "Visa **** 1234",
+            category = "Shopping",
+            notes = "Birthday gift",
+            receiptUrl = null,
+            location = "New York, USA",
+            convertedAmount = null,
+            rewardPoints = 60,
+            isRecurring = false,
+            transactionType = "Debit"
+        ),
+        FullTransaction(
+            id = "TXN654321",
+            dateTime = "2025-05-06 3:20 PM",
+            amount = -15.00,
+            currency = "USD",
+            status = "Pending",
+            merchant = "Spotify",
+            paymentMethod = "Mastercard **** 5678",
+            category = "Entertainment",
+            notes = "",
+            receiptUrl = null,
+            location = null,
+            convertedAmount = "EUR 13.50",
+            rewardPoints = null,
+            isRecurring = true,
+            transactionType = "Subscription"
+        )
+    )
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Transactions") }
+                title = {
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = { Text("Search") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { /* handle menu click */ }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* handle search action */ }) {
+                        Icon(Icons.Default.Search, contentDescription = "Search")
+                    }
+                }
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                // Add transaction logic
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Transaction")
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Home") },
+                    selected = selectedBottomItem == "Home",
+                    onClick = { selectedBottomItem = "Home" }
+                )
+
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.aaron),
+                            contentDescription = "AI",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Unspecified
+                        )
+                    },
+                    label = { Text("AI") },
+                    selected = selectedBottomItem == "AI",
+                    onClick = { selectedBottomItem = "AI" }
+                )
+
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+                    label = { Text("Profile") },
+                    selected = selectedBottomItem == "Profile",
+                    onClick = { selectedBottomItem = "Profile" }
+                )
+
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
+                    label = { Text("Alerts") },
+                    selected = selectedBottomItem == "Alerts",
+                    onClick = { selectedBottomItem = "Alerts" }
+                )
+
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
+                    label = { Text("Account") },
+                    selected = selectedBottomItem == "Account",
+                    onClick = { selectedBottomItem = "Account" }
+                )
             }
         }
-    ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            TransactionSummary(transactions)
-            CategoryBreakdown(transactions)
 
+
+//        topBar = {
+//            CenterAlignedTopAppBar(
+//                title = { Text("Transaction History") },
+////                actions = {
+////                    IconButton(onClick = { hideAmount = !hideAmount }) {
+////                        Icon(
+////                            if (hideAmount) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+////                            contentDescription = "Toggle Amount"
+////                        )
+////                    }
+////                }
+//            )
+//        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .padding(12.dp)
+        ) {
+//            OutlinedTextField(
+//                value = search,
+//                onValueChange = { search = it },
+//                modifier = Modifier.fillMaxWidth(),
+//                label = { Text("Search by merchant, amount...") }
+//            )
+            Spacer(Modifier.height(8.dp))
+            Row {
+                OutlinedTextField(
+                    value = dateRange,
+                    onValueChange = { dateRange = it },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 4.dp),
+                    label = { Text("Date Range") }
+                )
+                OutlinedTextField(
+                    value = amountRange,
+                    onValueChange = { amountRange = it },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp),
+                    label = { Text("Amount Range") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                )
+            }
+            Spacer(Modifier.height(8.dp))
             OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                label = { Text("Search Transactions") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                value = typeFilter,
+                onValueChange = { typeFilter = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Type: Debit, Credit, Refund...") }
             )
 
-            val filteredTransactions = transactions.filter {
-                it.category.contains(searchQuery, ignoreCase = true) ||
-                        it.merchant.contains(searchQuery, ignoreCase = true)
-            }
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                items(filteredTransactions, key = { it.id }) { txn ->
-                    TransactionRow(
-                        transaction = txn,
-                        onDelete = { transactions = transactions - it },
-                        onEdit = { /* Navigate to edit screen */ },
-                        onClick = { /* Navigate to details screen */ }
-                    )
+            LazyColumn {
+                items(transactions.filter {
+                    it.merchant.contains(search, true) || it.category.contains(search, true)
+                }) { txn ->
+                    TransactionCard(txn = txn, hideAmount = hideAmount)
                 }
             }
         }
     }
 }
-
-// Preview
 @Preview(showBackground = true)
-@Composable
-fun TransactionScreenPreview() {
-    MaterialTheme {
-        TransactionScreen()
+    @Composable
+    fun PreviewFullTransactionScreen() {
+        MaterialTheme {
+            FullTransactionScreen()
+        }
     }
-}

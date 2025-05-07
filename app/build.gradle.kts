@@ -40,7 +40,13 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.okhttp.v4100)
+    implementation(libs.moshi)
+    implementation(libs.okhttp)
+    implementation(libs.gson)
+    implementation(libs.androidx.activity.compose.v180)
+    implementation(libs.androidx.lifecycle.runtime.ktx.v262)
+    implementation (libs.androidx.navigation.compose.v277)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

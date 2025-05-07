@@ -110,22 +110,21 @@ fun BudgetTrackerApp() {
 // ---------- Top Bar Wrapper ----------
 @Composable
 fun ScreenWithTopBar(title: String, onBack: () -> Unit, content: @Composable () -> Unit) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(title) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            content()
+    Surface(
+        tonalElevation = 4.dp,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Custom Center Title", style = MaterialTheme.typography.titleLarge)
         }
     }
+
 }
 
 // ---------- Summary Screen ----------
