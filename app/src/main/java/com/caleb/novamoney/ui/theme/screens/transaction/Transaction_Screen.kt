@@ -25,7 +25,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.caleb.novamoney.R
+import com.caleb.novamoney.navigation.ROUTE_ACCOUNT
+import com.caleb.novamoney.navigation.ROUTE_HOME
+import com.caleb.novamoney.navigation.ROUTE_NOTIFICATION
+import com.caleb.novamoney.navigation.ROUTE_PROFILE
 
 data class FullTransaction(
     val id: String,
@@ -182,7 +188,7 @@ fun ActionIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, label: Str
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FullTransactionScreen() {
+fun FullTransactionScreen(navController: NavController) {
     var hideAmount by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf("") }
     var dateRange by remember { mutableStateOf("") }
@@ -241,7 +247,9 @@ fun FullTransactionScreen() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* handle menu click */ }) {
+                    IconButton(onClick = {
+
+                     }) {
                         Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
                 },
@@ -258,42 +266,50 @@ fun FullTransactionScreen() {
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") },
                     selected = selectedBottomItem == "Home",
-                    onClick = { selectedBottomItem = "Home" }
+                    onClick = {
+                        navController.navigate(ROUTE_HOME)
+                        selectedBottomItem = "Home" }
                 )
 
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.aaron),
-                            contentDescription = "AI",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Unspecified
-                        )
-                    },
-                    label = { Text("AI") },
-                    selected = selectedBottomItem == "AI",
-                    onClick = { selectedBottomItem = "AI" }
-                )
+//                NavigationBarItem(
+//                    icon = {
+//                        Icon(
+//                            painter = painterResource(id = R.drawable.aaron),
+//                            contentDescription = "AI",
+//                            modifier = Modifier.size(24.dp),
+//                            tint = Color.Unspecified
+//                        )
+//                    },
+//                    label = { Text("AI") },
+//                    selected = selectedBottomItem == "AI",
+//                    onClick = { selectedBottomItem = "AI" }
+//                )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
                     selected = selectedBottomItem == "Profile",
-                    onClick = { selectedBottomItem = "Profile" }
+                    onClick = {
+                        navController.navigate(ROUTE_PROFILE)
+                        selectedBottomItem = "Profile" }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
                     label = { Text("Alerts") },
                     selected = selectedBottomItem == "Alerts",
-                    onClick = { selectedBottomItem = "Alerts" }
+                    onClick = {
+                        navController.navigate(ROUTE_NOTIFICATION)
+                        selectedBottomItem = "Alerts" }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
                     label = { Text("Account") },
                     selected = selectedBottomItem == "Account",
-                    onClick = { selectedBottomItem = "Account" }
+                    onClick = {
+                        navController.navigate(ROUTE_ACCOUNT)
+                        selectedBottomItem = "Account" }
                 )
             }
         }
@@ -366,6 +382,6 @@ fun FullTransactionScreen() {
     @Composable
     fun PreviewFullTransactionScreen() {
         MaterialTheme {
-            FullTransactionScreen()
+            FullTransactionScreen(rememberNavController())
         }
     }

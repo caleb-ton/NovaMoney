@@ -1,7 +1,4 @@
-package com.caleb.novamoney.ui.theme.screens.home
-
-
-
+package com.caleb.novamoney.model
 
 import android.content.Intent
 import android.net.Uri
@@ -18,14 +15,15 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.caleb.novamoney.R
@@ -37,21 +35,18 @@ import com.caleb.novamoney.navigation.ROUTE_SETTINGS
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController) {
-    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
-    var selectedBottomItem by remember { mutableStateOf("Home") }
+fun MainScreen(
+    navController: NavController,
+    viewModel: MainViewModel = viewModel()
+) {
+    val searchQuery by viewModel.searchQuery
+    val selectedBottomItem by viewModel.selectedBottomItem
+    val newsList by viewModel.newsList
     val context = LocalContext.current
     val url = "https://www.cnbc.com/world/?region=world"
-    val newsList = listOf(
-        "Markets Rally as Tech Stocks Surge",
-        "Federal Reserve Holds Interest Rates",
-        "Bitcoin Hits New High",
-        "Oil Prices Drop Amid Global Uncertainty",
-        "Major Banks Announce Quarterly Earnings"
-    )
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // 👇 App Logo at the top
+        // App Logo at the top
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -59,7 +54,7 @@ fun MainScreen(navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.aaron), // 👈 Replace with your actual logo resource
+                painter = painterResource(id = R.drawable.aaron),
                 contentDescription = "App Logo",
                 modifier = Modifier.size(60.dp)
             )
@@ -71,7 +66,7 @@ fun MainScreen(navController: NavController) {
                     title = {
                         TextField(
                             value = searchQuery,
-                            onValueChange = { searchQuery = it },
+                            onValueChange = { viewModel.onSearchQueryChanged(it) },
                             placeholder = { Text("Search finance news") },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
@@ -83,7 +78,7 @@ fun MainScreen(navController: NavController) {
                         }
                     },
                     actions = {
-                        IconButton(onClick = { /* handle search action */ }) {
+                        IconButton(onClick = { /* handle search */ }) {
                             Icon(Icons.Default.Search, contentDescription = "Search")
                         }
                     }
@@ -97,37 +92,34 @@ fun MainScreen(navController: NavController) {
                         selected = selectedBottomItem == "Home",
                         onClick = {
                             navController.navigate(ROUTE_HOME)
-                            selectedBottomItem = "Home"
+                            viewModel.onBottomItemSelected("Home")
                         }
                     )
-
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                         label = { Text("Profile") },
                         selected = selectedBottomItem == "Profile",
                         onClick = {
                             navController.navigate(ROUTE_PROFILE)
-                            selectedBottomItem = "Profile"
+                            viewModel.onBottomItemSelected("Profile")
                         }
                     )
-
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
                         label = { Text("Alerts") },
                         selected = selectedBottomItem == "Alerts",
                         onClick = {
                             navController.navigate(ROUTE_NOTIFICATION)
-                            selectedBottomItem = "Alerts"
+                            viewModel.onBottomItemSelected("Alerts")
                         }
                     )
-
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
                         label = { Text("Account") },
                         selected = selectedBottomItem == "Account",
                         onClick = {
                             navController.navigate(ROUTE_ACCOUNT)
-                            selectedBottomItem = "Account"
+                            viewModel.onBottomItemSelected("Account")
                         }
                     )
                 }
@@ -167,8 +159,11 @@ fun MainScreen(navController: NavController) {
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
-    MainScreen(rememberNavController())
+fun MainScreenPreview() {
+    val navController = rememberNavController()
+    // Optional: Provide a fake ViewModel using a custom preview ViewModel or mock data if needed
+    MainScreen(navController = navController)
 }

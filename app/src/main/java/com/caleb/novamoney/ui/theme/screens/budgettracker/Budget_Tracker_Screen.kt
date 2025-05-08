@@ -2,6 +2,7 @@ package com.caleb.novamoney.ui.theme.screens.budgettracker
 
 
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,12 +23,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.caleb.novamoney.R
+import com.caleb.novamoney.navigation.ROUTE_ACCOUNT
+import com.caleb.novamoney.navigation.ROUTE_HOME
+import com.caleb.novamoney.navigation.ROUTE_NOTIFICATION
+import com.caleb.novamoney.navigation.ROUTE_PROFILE
 import com.caleb.novamoney.ui.theme.NovaMoneyTheme
-import androidx.compose.material3.CenterAlignedTopAppBar
 
 // ---------- Activity ----------
-class MainActivity : ComponentActivity() {
+class BudgetTrackerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    BudgetTrackerApp()
+                    BudgetTrackerApp(rememberNavController())
                 }
             }
         }
@@ -49,7 +55,7 @@ data class Transaction(val id: Int, val category: String, val amount: Float, val
 
 // ---------- Main App ----------
 @Composable
-fun BudgetTrackerApp() {
+fun BudgetTrackerApp(navController: NavController) {
     var selectedTab by remember { mutableStateOf("Home") }
 
     Scaffold(
@@ -59,38 +65,46 @@ fun BudgetTrackerApp() {
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") },
                     selected = selectedTab == "Home",
-                    onClick = { selectedTab = "Home" }
+                    onClick = {
+                        navController.navigate(ROUTE_HOME)
+                        selectedTab = "Home" }
                 )
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.aaron),
-                            contentDescription = "AI",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Unspecified
-                        )
-                    },
-                    label = { Text("AI") },
-                    selected = selectedTab == "AI",
-                    onClick = { selectedTab = "AI" }
-                )
+//                NavigationBarItem(
+//                    icon = {
+//                        Icon(
+//                            painter = painterResource(id = R.drawable.aaron),  // ✅ Make sure this drawable exists!
+//                            contentDescription = "AI",
+//                            modifier = Modifier.size(24.dp),
+//                            tint = Color.Unspecified
+//                        )
+//                    },
+//                    label = { Text("AI") },
+//                    selected = selectedTab == "AI",
+//                    onClick = { selectedTab = "AI" }
+//                )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
                     selected = selectedTab == "Profile",
-                    onClick = { selectedTab = "Profile" }
+                    onClick = {
+                        navController.navigate(ROUTE_PROFILE)
+                        selectedTab = "Profile" }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
                     label = { Text("Alerts") },
                     selected = selectedTab == "Alerts",
-                    onClick = { selectedTab = "Alerts" }
+                    onClick = {
+                        navController.navigate(ROUTE_NOTIFICATION)
+                        selectedTab = "Alerts" }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
                     label = { Text("Account") },
                     selected = selectedTab == "Account",
-                    onClick = { selectedTab = "Account" }
+                    onClick = {
+                        navController.navigate(ROUTE_ACCOUNT)
+                        selectedTab = "Account" }
                 )
             }
         }
@@ -110,21 +124,27 @@ fun BudgetTrackerApp() {
 // ---------- Top Bar Wrapper ----------
 @Composable
 fun ScreenWithTopBar(title: String, onBack: () -> Unit, content: @Composable () -> Unit) {
-    Surface(
-        tonalElevation = 4.dp,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 16.dp),
-            contentAlignment = Alignment.Center
+    Column {
+        Surface(
+            tonalElevation = 4.dp,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Custom Center Title", style = MaterialTheme.typography.titleLarge)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(title, style = MaterialTheme.typography.titleLarge)
+            }
+        }
+
+        // ✅ Include your content here:
+        Box(modifier = Modifier.fillMaxSize()) {
+            content()
         }
     }
-
 }
 
 // ---------- Summary Screen ----------
@@ -137,8 +157,9 @@ fun SummaryScreen() {
             Category("Entertainment", 300f, 280f, Color(0xFF2196F3))
         )
 
-        val totalBudget = categories.map { it.budget }.reduce { acc, value -> acc + value }
-        val totalSpent = categories.map { it.spent }.reduce { acc, value -> acc + value }
+        val totalBudget = categories.map { it.budget }.sum()
+        val totalSpent = categories.map { it.spent }.sum()
+
 
         val remaining = totalBudget - totalSpent
         val progress = (totalSpent / totalBudget).coerceIn(0f, 1f)

@@ -1,6 +1,10 @@
 package com.caleb.novamoney.ui.theme.screens.profile
 
 
+
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,22 +16,29 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.caleb.novamoney.R
+import com.caleb.novamoney.navigation.ROUTE_ACCOUNT
+import com.caleb.novamoney.navigation.ROUTE_HOME
+import com.caleb.novamoney.navigation.ROUTE_NOTIFICATION
+import com.caleb.novamoney.navigation.ROUTE_PROFILE
+import com.caleb.novamoney.model.ProfileViewModel
 
 @Composable
-fun EditProfileScreenWithBottomBar(
-    onBackClick: () -> Unit = {},
-    onSaveClick: (String, String) -> Unit = { _, _ -> }
-) {
+fun EditProfileScreenWithBottomBar(navController: NavController) {
     var selectedBottomItem by remember { mutableStateOf("Profile") }
-    var name by remember { mutableStateOf(TextFieldValue("John Doe")) }
-    var email by remember { mutableStateOf(TextFieldValue("johndoe@example.com")) }
-    var isSaving by remember { mutableStateOf(false) }
+    val profileViewModel: ProfileViewModel = viewModel()
+
+    // Register the image picker launcher
+    val getContent = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        profileViewModel.updateProfileImage(uri)
+    }
 
     Scaffold(
         bottomBar = {
@@ -36,42 +47,40 @@ fun EditProfileScreenWithBottomBar(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") },
                     selected = selectedBottomItem == "Home",
-                    onClick = { selectedBottomItem = "Home" }
-                )
-
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.aaron),
-                            contentDescription = "AI",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Unspecified
-                        )
-                    },
-                    label = { Text("AI") },
-                    selected = selectedBottomItem == "AI",
-                    onClick = { selectedBottomItem = "AI" }
+                    onClick = {
+                        navController.navigate(ROUTE_HOME)
+                        selectedBottomItem = "Home"
+                    }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
                     selected = selectedBottomItem == "Profile",
-                    onClick = { selectedBottomItem = "Profile" }
+                    onClick = {
+                        navController.navigate(ROUTE_PROFILE)
+                        selectedBottomItem = "Profile"
+                    }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
                     label = { Text("Alerts") },
                     selected = selectedBottomItem == "Alerts",
-                    onClick = { selectedBottomItem = "Alerts" }
+                    onClick = {
+                        navController.navigate(ROUTE_NOTIFICATION)
+                        selectedBottomItem = "Alerts"
+                    }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
                     label = { Text("Account") },
                     selected = selectedBottomItem == "Account",
-                    onClick = { selectedBottomItem = "Account" }
+                    onClick = {
+                        navController.navigate(ROUTE_ACCOUNT)
+                        selectedBottomItem = "Account"
+                    }
                 )
             }
         }
@@ -87,7 +96,9 @@ fun EditProfileScreenWithBottomBar(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = { onBackClick() }) {
+                IconButton(onClick = {
+                    navController.navigate(ROUTE_PROFILE)
+                }) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -98,19 +109,10 @@ fun EditProfileScreenWithBottomBar(
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
-                        if (!isSaving) {
-                            isSaving = true
-                            onSaveClick(name.text, email.text)
-                            // Here you could launch a coroutine or similar to handle async save
-                            isSaving = false
-                        }
-                    },
-                    enabled = !isSaving
+                        profileViewModel.saveProfile()
+                    }
                 ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = if (isSaving) "Saving..." else "Save"
-                    )
+                    Icon(Icons.Default.Check, contentDescription = "Save")
                 }
             }
 
@@ -123,12 +125,19 @@ fun EditProfileScreenWithBottomBar(
                     .align(Alignment.CenterHorizontally)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.profile),
+                    painter = if (profileViewModel.profileImageUri.value != null) {
+                        rememberImagePainter(profileViewModel.profileImageUri.value)
+                    } else {
+                        painterResource(id = R.drawable.profile) // Default profile picture
+                    },
                     contentDescription = "Profile Picture",
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .clickable { /* TODO: handle change picture */ }
+                        .clickable {
+                            // Open gallery when clicked
+                            getContent.launch("image/*")
+                        }
                 )
             }
 
@@ -136,23 +145,25 @@ fun EditProfileScreenWithBottomBar(
 
             // Name input
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = profileViewModel.name.value,
+                onValueChange = { profileViewModel.updateName(it) }, // Directly passing `it` (the text string) to updateName
                 label = { Text("Name") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // Email input
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = profileViewModel.email.value,
+                onValueChange = { profileViewModel.updateName(it) },
                 label = { Text("Email") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
+
         }
     }
 }
@@ -160,5 +171,6 @@ fun EditProfileScreenWithBottomBar(
 @Preview(showBackground = true)
 @Composable
 fun EditProfileScreenWithBottomBarPreview() {
-    EditProfileScreenWithBottomBar()
+    EditProfileScreenWithBottomBar(rememberNavController())
 }
+

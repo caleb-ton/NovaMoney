@@ -17,9 +17,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.caleb.novamoney.navigation.ROUTE_ACCOUNT
+import com.caleb.novamoney.navigation.ROUTE_NOTIFICATION
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(navController: NavController) {
     val context = LocalContext.current
 
     Scaffold(
@@ -40,6 +44,7 @@ fun SettingsScreen() {
                 title = "Account",
                 subtitle = "Manage your account",
                 onClick = {
+                    navController.navigate(ROUTE_ACCOUNT)
                     Toast.makeText(context, "Account clicked", Toast.LENGTH_SHORT).show()
                 }
             )
@@ -48,28 +53,29 @@ fun SettingsScreen() {
                 title = "Notifications",
                 subtitle = "Notification preferences",
                 onClick = {
+                    navController.navigate(ROUTE_NOTIFICATION)
                     Toast.makeText(context, "Notifications clicked", Toast.LENGTH_SHORT).show()
                 }
             )
             Spacer(Modifier.height(16.dp))
-            Text("Support", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Gray)
-            Spacer(Modifier.height(8.dp))
-            SettingsItem(
-                icon = Icons.Default.Build,
-                title = "Help & Support",
-                subtitle = "Get assistance",
-                onClick = {
-                    Toast.makeText(context, "Help clicked", Toast.LENGTH_SHORT).show()
-                }
-            )
-            SettingsItem(
-                icon = Icons.Default.Info,
-                title = "About",
-                subtitle = "App information",
-                onClick = {
-                    Toast.makeText(context, "About clicked", Toast.LENGTH_SHORT).show()
-                }
-            )
+//            Text("Support", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Gray)
+//            Spacer(Modifier.height(8.dp))
+//            SettingsItem(
+//                icon = Icons.Default.Build,
+//                title = "Help & Support",
+//                subtitle = "Get assistance",
+//                onClick = {
+//                    Toast.makeText(context, "Help clicked", Toast.LENGTH_SHORT).show()
+//                }
+//            )
+//            SettingsItem(
+//                icon = Icons.Default.Info,
+//                title = "About",
+//                subtitle = "App information",
+//                onClick = {
+//                    Toast.makeText(context, "About clicked", Toast.LENGTH_SHORT).show()
+//                }
+//            )
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = {
@@ -113,6 +119,6 @@ fun SettingsItem(
 @Composable
 fun PreviewSettingsScreen() {
     MaterialTheme {
-        SettingsScreen()
+        SettingsScreen(rememberNavController())
     }
 }

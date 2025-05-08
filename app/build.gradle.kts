@@ -40,6 +40,9 @@ android {
 }
 
 dependencies {
+    implementation(libs.coil.compose)
+    implementation (libs.androidx.activity.compose.v131)
+    implementation (libs.androidx.material3.v100)
     implementation(libs.okhttp.v4100)
     implementation(libs.moshi)
     implementation(libs.okhttp)

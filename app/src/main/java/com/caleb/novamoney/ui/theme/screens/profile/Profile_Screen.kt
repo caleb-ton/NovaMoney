@@ -20,10 +20,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.caleb.novamoney.R
+import com.caleb.novamoney.navigation.ROUTE_ACCOUNT
+import com.caleb.novamoney.navigation.ROUTE_HOME
+import com.caleb.novamoney.navigation.ROUTE_NOTIFICATION
+import com.caleb.novamoney.navigation.ROUTE_PROFILE
 
 @Composable
-fun ProfileScreenWithBottomBar() {
+fun ProfileScreenWithBottomBar(navController: NavController) {
     var selectedBottomItem by remember { mutableStateOf("Profile") }
 
     Scaffold(
@@ -33,42 +39,50 @@ fun ProfileScreenWithBottomBar() {
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") },
                     selected = selectedBottomItem == "Home",
-                    onClick = { selectedBottomItem = "Home" }
+                    onClick = {
+                        navController.navigate(ROUTE_HOME)
+                        selectedBottomItem = "Home" }
                 )
 
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.aaron),
-                            contentDescription = "AI",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Unspecified
-                        )
-                    },
-                    label = { Text("AI") },
-                    selected = selectedBottomItem == "AI",
-                    onClick = { selectedBottomItem = "AI" }
-                )
+//                NavigationBarItem(
+//                    icon = {
+//                        Icon(
+//                            painter = painterResource(id = R.drawable.aaron),
+//                            contentDescription = "AI",
+//                            modifier = Modifier.size(24.dp),
+//                            tint = Color.Unspecified
+//                        )
+//                    },
+//                    label = { Text("AI") },
+//                    selected = selectedBottomItem == "AI",
+//                    onClick = { selectedBottomItem = "AI" }
+//                )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
                     selected = selectedBottomItem == "Profile",
-                    onClick = { selectedBottomItem = "Profile" }
+                    onClick = {
+                        navController.navigate(ROUTE_PROFILE)
+                        selectedBottomItem = "Profile" }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
                     label = { Text("Alerts") },
                     selected = selectedBottomItem == "Alerts",
-                    onClick = { selectedBottomItem = "Alerts" }
+                    onClick = {
+                        navController.navigate(ROUTE_NOTIFICATION)
+                        selectedBottomItem = "Alerts" }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
                     label = { Text("Account") },
                     selected = selectedBottomItem == "Account",
-                    onClick = { selectedBottomItem = "Account" }
+                    onClick = {
+                        navController.navigate(ROUTE_ACCOUNT)
+                        selectedBottomItem = "Account" }
                 )
             }
         }
@@ -89,9 +103,10 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(onClick = { /* TODO: handle back action */ }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-            }
+//            IconButton(onClick = { /* TODO: handle back action */ })
+//            {
+//                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+//            }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Profile",
@@ -128,9 +143,9 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /* TODO: handle save action */ }) {
-                Icon(Icons.Default.Check, contentDescription = "Save Changes")
-            }
+//            IconButton(onClick = {/* TODO: handle save action */ }) {
+//                Icon(Icons.Default.Check, contentDescription = "Save Changes")
+//            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -147,7 +162,8 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
         ProfileOptionItem(
             icon = Icons.Default.Notifications,
             title = "Notifications",
-            onClick = { /* TODO: handle notifications click */ }
+            onClick = {
+            /* TODO: handle notifications click */ }
         )
 
         Spacer(modifier = Modifier.height(16.dp)) // smaller space between
@@ -193,5 +209,5 @@ fun ProfileOptionItem(
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    ProfileScreenWithBottomBar()
+    ProfileScreenWithBottomBar(rememberNavController())
 }

@@ -17,11 +17,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.caleb.novamoney.R
+import com.caleb.novamoney.navigation.ROUTE_ACCOUNT
+import com.caleb.novamoney.navigation.ROUTE_HOME
+import com.caleb.novamoney.navigation.ROUTE_NOTIFICATION
+import com.caleb.novamoney.navigation.ROUTE_PROFILE
 import com.caleb.novamoney.ui.theme.NovaMoneyTheme
 
 @Composable
-fun InvestmentScreenWithBottomBar() {
+fun InvestmentScreenWithBottomBar(navController: NavController) {
     var selectedBottomItem by remember { mutableStateOf("Home") }
 
     Scaffold(
@@ -31,38 +37,46 @@ fun InvestmentScreenWithBottomBar() {
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") },
                     selected = selectedBottomItem == "Home",
-                    onClick = { selectedBottomItem = "Home" }
+                    onClick = {
+                        navController.navigate(ROUTE_HOME)
+                        selectedBottomItem = "Home" }
                 )
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.aaron),
-                            contentDescription = "AI",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Unspecified
-                        )
-                    },
-                    label = { Text("AI") },
-                    selected = selectedBottomItem == "AI",
-                    onClick = { selectedBottomItem = "AI" }
-                )
+//                NavigationBarItem(
+//                    icon = {
+//                        Icon(
+//                            painter = painterResource(id = R.drawable.aaron),
+//                            contentDescription = "AI",
+//                            modifier = Modifier.size(24.dp),
+//                            tint = Color.Unspecified
+//                        )
+//                    },
+//                    label = { Text("AI") },
+//                    selected = selectedBottomItem == "AI",
+//                    onClick = { selectedBottomItem = "AI" }
+//                )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
                     selected = selectedBottomItem == "Profile",
-                    onClick = { selectedBottomItem = "Profile" }
+                    onClick = {
+                        navController.navigate(ROUTE_PROFILE)
+                        selectedBottomItem = "Profile" }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
                     label = { Text("Alerts") },
                     selected = selectedBottomItem == "Alerts",
-                    onClick = { selectedBottomItem = "Alerts" }
+                    onClick = {
+                        navController.navigate(ROUTE_NOTIFICATION)
+                        selectedBottomItem = "Alerts" }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
                     label = { Text("Account") },
                     selected = selectedBottomItem == "Account",
-                    onClick = { selectedBottomItem = "Account" }
+                    onClick = {
+                        navController.navigate(ROUTE_ACCOUNT)
+                        selectedBottomItem = "Account" }
                 )
             }
         }
@@ -178,6 +192,6 @@ fun SummaryRow(label: String, value: String, valueColor: Color = MaterialTheme.c
 @Composable
 fun InvestmentScreenWithBottomBarPreview() {
     NovaMoneyTheme {
-        InvestmentScreenWithBottomBar()
+        InvestmentScreenWithBottomBar(rememberNavController())
     }
 }
