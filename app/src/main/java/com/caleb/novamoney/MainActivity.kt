@@ -1,26 +1,21 @@
-//package com.caleb.novamoney
-//
-//
-//import android.os.Bundle
-//import androidx.activity.ComponentActivity
-//import androidx.activity.compose.setContent
-//import androidx.compose.runtime.Composable
-//import androidx.navigation.compose.NavHost
-//import androidx.navigation.compose.composable
-//import androidx.navigation.compose.rememberNavController
-//import com.caleb.novamoney.ui.theme.screens.home.MainScreen
-//import com.caleb.novamoney.ui.theme.screens.login.LoginScreen
-//import com.caleb.novamoney.ui.theme.screens.register.SignUpScreen
-//
-//class MainActivity : ComponentActivity() {
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContent {
-//            AppNavigation()
-//        }
-//    }
-//}
-//
+package com.caleb.novamoney
+
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.caleb.novamoney.navigation.AppNavHost
+
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            AppNavHost()
+        }
+    }
+}
+
 //@Composable
 //fun AppNavigation() {
 //    val navController = rememberNavController()

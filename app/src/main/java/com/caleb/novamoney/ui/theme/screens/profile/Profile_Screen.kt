@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -103,10 +102,10 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-//            IconButton(onClick = { /* TODO: handle back action */ })
-//            {
-//                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-//            }
+            IconButton(onClick = { /* TODO: handle back action */ })
+            {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Profile",
@@ -143,9 +142,9 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-//            IconButton(onClick = {/* TODO: handle save action */ }) {
-//                Icon(Icons.Default.Check, contentDescription = "Save Changes")
-//            }
+            IconButton(onClick = {/* TODO: handle save action */ }) {
+                Icon(Icons.Default.Check, contentDescription = "Save Changes")
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))

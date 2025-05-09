@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.caleb.novamoney.R
 import com.caleb.novamoney.navigation.ROUTE_ACCOUNT
 import com.caleb.novamoney.navigation.ROUTE_HOME
 import com.caleb.novamoney.navigation.ROUTE_NOTIFICATION
@@ -334,12 +332,12 @@ fun FullTransactionScreen(navController: NavController) {
                 .padding(padding)
                 .padding(12.dp)
         ) {
-//            OutlinedTextField(
-//                value = search,
-//                onValueChange = { search = it },
-//                modifier = Modifier.fillMaxWidth(),
-//                label = { Text("Search by merchant, amount...") }
-//            )
+            OutlinedTextField(
+                value = search,
+                onValueChange = { search = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Search by merchant, amount...") }
+            )
             Spacer(Modifier.height(8.dp))
             Row {
                 OutlinedTextField(
