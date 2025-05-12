@@ -2,7 +2,6 @@ package com.caleb.novamoney.ui.theme.screens.budgettracker
 
 
 
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,19 +67,6 @@ fun BudgetTrackerApp(navController: NavController) {
                         navController.navigate(ROUTE_HOME)
                         selectedTab = "Home" }
                 )
-//                NavigationBarItem(
-//                    icon = {
-//                        Icon(
-//                            painter = painterResource(id = R.drawable.aaron),  // ✅ Make sure this drawable exists!
-//                            contentDescription = "AI",
-//                            modifier = Modifier.size(24.dp),
-//                            tint = Color.Unspecified
-//                        )
-//                    },
-//                    label = { Text("AI") },
-//                    selected = selectedTab == "AI",
-//                    onClick = { selectedTab = "AI" }
-//                )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
@@ -111,11 +96,11 @@ fun BudgetTrackerApp(navController: NavController) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when (selectedTab) {
-                "Home" -> SummaryScreen()
-                "AI" -> TransactionFeed()
-                "Profile" -> BudgetSettingsScreen()
-                "Alerts" -> AlertsScreen()
-                "Account" -> AccountScreen()
+                "Home" -> SummaryScreen(navController)
+                "AI" -> TransactionFeed(navController)
+                "Profile" -> BudgetSettingsScreen(navController)
+                "Alerts" -> AlertsScreen(navController)
+                "Account" -> AccountScreen(navController)
             }
         }
     }
@@ -136,6 +121,9 @@ fun ScreenWithTopBar(title: String, onBack: () -> Unit, content: @Composable () 
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                }
                 Text(title, style = MaterialTheme.typography.titleLarge)
             }
         }
@@ -149,8 +137,8 @@ fun ScreenWithTopBar(title: String, onBack: () -> Unit, content: @Composable () 
 
 // ---------- Summary Screen ----------
 @Composable
-fun SummaryScreen() {
-    ScreenWithTopBar(title = "Budget Summary", onBack = { /* Handle back */ }) {
+fun SummaryScreen(navController: NavController) {
+    ScreenWithTopBar(title = "Budget Summary", onBack = { navController.popBackStack() }) {
         val categories = listOf(
             Category("Food", 500f, 320f, Color(0xFF4CAF50)),
             Category("Transport", 200f, 120f, Color(0xFFFF9800)),
@@ -159,8 +147,6 @@ fun SummaryScreen() {
 
         val totalBudget = categories.map { it.budget }.sum()
         val totalSpent = categories.map { it.spent }.sum()
-
-
         val remaining = totalBudget - totalSpent
         val progress = (totalSpent / totalBudget).coerceIn(0f, 1f)
 
@@ -209,8 +195,8 @@ fun SummaryScreen() {
 
 // ---------- Transaction Feed ----------
 @Composable
-fun TransactionFeed() {
-    ScreenWithTopBar(title = "Transactions", onBack = { /* Handle back */ }) {
+fun TransactionFeed(navController: NavController) {
+    ScreenWithTopBar(title = "Transactions", onBack = { navController.popBackStack() }) {
         val transactions = listOf(
             Transaction(1, "Food", 25f, "2025-05-01", "Lunch"),
             Transaction(2, "Transport", 15f, "2025-05-02", "Taxi"),
@@ -247,8 +233,8 @@ fun TransactionFeed() {
 
 // ---------- Budget Settings ----------
 @Composable
-fun BudgetSettingsScreen() {
-    ScreenWithTopBar(title = "Budget Settings", onBack = { /* Handle back */ }) {
+fun BudgetSettingsScreen(navController: NavController) {
+    ScreenWithTopBar(title = "Budget Settings", onBack = { navController.popBackStack() }) {
         val categories = remember {
             mutableStateListOf(
                 Category("Food", 500f, 320f, Color(0xFF4CAF50)),
@@ -299,8 +285,8 @@ fun BudgetSettingsScreen() {
 
 // ---------- Placeholder Screens ----------
 @Composable
-fun AlertsScreen() {
-    ScreenWithTopBar(title = "Alerts", onBack = { /* Handle back */ }) {
+fun AlertsScreen(navController: NavController) {
+    ScreenWithTopBar(title = "Alerts", onBack = { navController.popBackStack() }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Alerts Screen Coming Soon")
         }
@@ -308,8 +294,8 @@ fun AlertsScreen() {
 }
 
 @Composable
-fun AccountScreen() {
-    ScreenWithTopBar(title = "Account", onBack = { /* Handle back */ }) {
+fun AccountScreen(navController: NavController) {
+    ScreenWithTopBar(title = "Account", onBack = { navController.popBackStack() }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Account Screen Coming Soon")
         }
@@ -320,17 +306,20 @@ fun AccountScreen() {
 @Preview(showBackground = true)
 @Composable
 fun SummaryPreview() {
-    NovaMoneyTheme { SummaryScreen() }
+    NovaMoneyTheme { SummaryScreen(rememberNavController()) }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun TransactionFeedPreview() {
-    NovaMoneyTheme { TransactionFeed() }
+    NovaMoneyTheme { TransactionFeed(rememberNavController()) }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun BudgetSettingsPreview() {
-    NovaMoneyTheme { BudgetSettingsScreen() }
+    NovaMoneyTheme { BudgetSettingsScreen(rememberNavController()) }
 }
+
+
+

@@ -2,6 +2,7 @@ package com.caleb.novamoney.ui.theme.screens.profile
 
 
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,10 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.caleb.novamoney.R
-import com.caleb.novamoney.navigation.ROUTE_ACCOUNT
-import com.caleb.novamoney.navigation.ROUTE_HOME
-import com.caleb.novamoney.navigation.ROUTE_NOTIFICATION
-import com.caleb.novamoney.navigation.ROUTE_PROFILE
+import com.caleb.novamoney.navigation.*
 
 @Composable
 fun ProfileScreenWithBottomBar(navController: NavController) {
@@ -40,58 +39,50 @@ fun ProfileScreenWithBottomBar(navController: NavController) {
                     selected = selectedBottomItem == "Home",
                     onClick = {
                         navController.navigate(ROUTE_HOME)
-                        selectedBottomItem = "Home" }
+                        selectedBottomItem = "Home"
+                    }
                 )
-
-//                NavigationBarItem(
-//                    icon = {
-//                        Icon(
-//                            painter = painterResource(id = R.drawable.aaron),
-//                            contentDescription = "AI",
-//                            modifier = Modifier.size(24.dp),
-//                            tint = Color.Unspecified
-//                        )
-//                    },
-//                    label = { Text("AI") },
-//                    selected = selectedBottomItem == "AI",
-//                    onClick = { selectedBottomItem = "AI" }
-//                )
-
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
                     selected = selectedBottomItem == "Profile",
                     onClick = {
                         navController.navigate(ROUTE_PROFILE)
-                        selectedBottomItem = "Profile" }
+                        selectedBottomItem = "Profile"
+                    }
                 )
-
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Notifications, contentDescription = "Alerts") },
                     label = { Text("Alerts") },
                     selected = selectedBottomItem == "Alerts",
                     onClick = {
                         navController.navigate(ROUTE_NOTIFICATION)
-                        selectedBottomItem = "Alerts" }
+                        selectedBottomItem = "Alerts"
+                    }
                 )
-
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Account") },
                     label = { Text("Account") },
                     selected = selectedBottomItem == "Account",
                     onClick = {
                         navController.navigate(ROUTE_ACCOUNT)
-                        selectedBottomItem = "Account" }
+                        selectedBottomItem = "Account"
+                    }
                 )
             }
         }
     ) { innerPadding ->
-        ProfileScreen(Modifier.padding(innerPadding))
+        ProfileScreen(
+            modifier = Modifier.padding(innerPadding),
+            navController = navController
+        )
     }
 }
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
+fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
+    val context = LocalContext.current
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -102,8 +93,7 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(onClick = { /* TODO: handle back action */ })
-            {
+            IconButton(onClick = { navController.popBackStack() }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
             Spacer(modifier = Modifier.width(8.dp))
@@ -122,7 +112,7 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
-                painter = painterResource(id = R.drawable.profile), // replace with your drawable
+                painter = painterResource(id = R.drawable.profile),
                 contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(80.dp)
@@ -142,7 +132,9 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = {/* TODO: handle save action */ }) {
+            IconButton(onClick = {
+                Toast.makeText(context, "Changes saved", Toast.LENGTH_SHORT).show()
+            }) {
                 Icon(Icons.Default.Check, contentDescription = "Save Changes")
             }
         }
@@ -153,24 +145,27 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
         ProfileOptionItem(
             icon = Icons.Default.Settings,
             title = "Settings",
-            onClick = { /* TODO: handle settings click */ }
+            onClick = { navController.navigate(ROUTE_SETTINGS) } // Replace with actual route
         )
 
-        Spacer(modifier = Modifier.height(16.dp)) // smaller space between
+        Spacer(modifier = Modifier.height(16.dp))
 
         ProfileOptionItem(
             icon = Icons.Default.Notifications,
             title = "Notifications",
-            onClick = {
-            /* TODO: handle notifications click */ }
+            onClick = { navController.navigate(ROUTE_NOTIFICATION) }
         )
 
-        Spacer(modifier = Modifier.height(16.dp)) // smaller space between
+        Spacer(modifier = Modifier.height(16.dp))
 
         ProfileOptionItem(
             icon = Icons.Default.ExitToApp,
             title = "Logout",
-            onClick = { /* TODO: handle logout click */ }
+            onClick = {
+                Toast.makeText(context, "Logged out", Toast.LENGTH_SHORT).show()
+                navController.navigate(ROUTE_LOGIN)
+
+            }
         )
     }
 }

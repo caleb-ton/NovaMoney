@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.caleb.novamoney.navigation.ROUTE_ACCOUNT
+import com.caleb.novamoney.navigation.ROUTE_LOGIN
 import com.caleb.novamoney.navigation.ROUTE_NOTIFICATION
 
 @Composable
@@ -76,10 +77,11 @@ fun SettingsScreen(navController: NavController) {
 //                    Toast.makeText(context, "About clicked", Toast.LENGTH_SHORT).show()
 //                }
 //            )
-            Spacer(Modifier.weight(1f))
+
             Button(
                 onClick = {
                     Toast.makeText(context, "Logged out", Toast.LENGTH_SHORT).show()
+                    navController.navigate(ROUTE_LOGIN)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)

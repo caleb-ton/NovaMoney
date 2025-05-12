@@ -114,7 +114,9 @@ fun AccountScreenContent(navController: NavController, modifier: Modifier = Modi
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = { /* Edit Profile */ }) {
+                Button(onClick = {
+                    navController.navigate(ROUTE_EDIT_PROFILE)
+                }) {
                     Text("Edit Profile")
                 }
             }

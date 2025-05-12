@@ -1,6 +1,6 @@
 package com.caleb.novamoney.navigation
 
-import androidx.compose.foundation.magnifier
+
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.caleb.novamoney.ui.theme.screens.budgettracker.BudgetTrackerApp
 import com.caleb.novamoney.ui.theme.screens.home.MainScreen
-import com.caleb.novamoney.ui.theme.screens.investment.InvestmentScreen
 import com.caleb.novamoney.ui.theme.screens.login.LoginScreen
 import com.caleb.novamoney.ui.theme.screens.profile.EditProfileScreenWithBottomBar
 import com.caleb.novamoney.ui.theme.screens.profile.ProfileScreen

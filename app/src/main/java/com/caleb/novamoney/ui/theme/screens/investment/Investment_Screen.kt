@@ -106,9 +106,9 @@ fun InvestmentScreen(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.aaron), // 👈 Replace with your actual logo resource
+                painter = painterResource(id = R.drawable.applogo),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(60.dp)
+                modifier = Modifier.fillMaxSize()
             )
         }
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "716150504686",
+    "project_id": "novamoney-cb7a1",
+    "storage_bucket": "novamoney-cb7a1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:716150504686:android:07e91ced41a6b02e5ec7ff",
+        "android_client_info": {
+          "package_name": "com.caleb.novamoney"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAU8cCtkGR73ojKbKHu0Vb8ykA1qtd-980"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
